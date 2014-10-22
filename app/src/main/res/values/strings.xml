@@ -5,4 +5,18 @@
     <string name="menu_logout">Log out</string>
     <string name="app_id">1485293455080435</string>
 
+    <string name="action_settings">Settings</string>
+    <string name="menu">Menü</string>
+
+    <string-array name="rivers">
+        <item>Suchen</item>
+        <item>Meine Eventz</item>
+        <item>Event anlegen</item>
+        <item>Log out</item>
+    </string-array>
+
+    <string name="drawer_open">Open navigation drawer</string>
+    <string name="drawer_close">Close navigation drawer</string>
+
+
 </resources>

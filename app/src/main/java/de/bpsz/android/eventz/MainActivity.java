@@ -2,12 +2,18 @@ package de.bpsz.android.eventz;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.widget.DrawerLayout;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -25,6 +31,11 @@ public class MainActivity extends FragmentActivity {
 
     private boolean isResumed = false;
     private UiLifecycleHelper uiHelper;
+
+    DrawerLayout drawerLayout;
+    ListView drawerList;
+    ActionBarDrawerToggle drawerToggle;
+    String title = "";
 
     private MenuItem logout;
 
@@ -46,6 +57,57 @@ public class MainActivity extends FragmentActivity {
         uiHelper.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        ////////////////////////////
+
+        title = (String) getTitle();
+
+        drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        drawerList = (ListView) findViewById(R.id.drawer_list);
+
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer,
+                R.string.drawer_open, R.string.drawer_close){
+
+            @Override
+            public void onDrawerClosed(View drawerView) {
+                getActionBar().setTitle(title);
+                invalidateOptionsMenu();
+            }
+
+            @Override
+            public void onDrawerOpened(View drawerView) {
+                getActionBar().setTitle(R.string.menu);
+                invalidateOptionsMenu();
+            }
+        };
+
+        drawerLayout.setDrawerListener(drawerToggle);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(
+                getBaseContext(), R.layout.drawer_list_item, getResources()
+                .getStringArray(R.array.rivers));
+        drawerList.setAdapter(adapter);
+
+        drawerToggle.setDrawerIndicatorEnabled(true);
+
+        // getActionBar().setHomeButtonEnabled(true);
+
+        // getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                // Do Something
+
+                drawerLayout.closeDrawer(drawerList);
+            }
+
+        });
+
+        //////////////////////////
 
         FragmentManager fm = getSupportFragmentManager();
         fragments[SPLASH] = fm.findFragmentById(R.id.splashFragment);
@@ -77,6 +139,21 @@ public class MainActivity extends FragmentActivity {
         Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
         uiHelper.onActivityResult(requestCode, resultCode, data);
     }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        drawerToggle.syncState();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main, menu);
+        return true;
+    }
+
+
 
     @Override
     public void onDestroy() {
@@ -119,10 +196,17 @@ public class MainActivity extends FragmentActivity {
             if (state.isOpened()) {
                 // If the session state is open:
                 // Show the authenticated fragment
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                drawerToggle.setDrawerIndicatorEnabled(true);
                 showFragment(SELECTION, false);
+
             } else if (state.isClosed()) {
                 // If the session state is closed:
                 // Show the login fragment
+                getActionBar().setDisplayHomeAsUpEnabled(false);
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+                drawerToggle.setDrawerIndicatorEnabled(false);
                 showFragment(SPLASH, false);
             }
         }
@@ -136,14 +220,21 @@ public class MainActivity extends FragmentActivity {
         if (session != null && session.isOpened()) {
             // if the session is already open,
             // try to show the selection fragment
+            getActionBar().setDisplayHomeAsUpEnabled(true);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+            drawerToggle.setDrawerIndicatorEnabled(true);
             showFragment(SELECTION, false);
         } else {
             // otherwise present the splash screen
             // and ask the person to login.
+            getActionBar().setDisplayHomeAsUpEnabled(false);
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            drawerToggle.setDrawerIndicatorEnabled(false);
             showFragment(SPLASH, false);
         }
     }
 
+    /*
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         // only add the menu when the selection fragment is showing
@@ -159,6 +250,10 @@ public class MainActivity extends FragmentActivity {
         return false;
     }
 
+    */
+
+
+    /*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.equals(logout)) {
@@ -168,6 +263,17 @@ public class MainActivity extends FragmentActivity {
         return false;
     }
 
+    */
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(drawerToggle.onOptionsItemSelected(item)){
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
     @Override
     public void onBackPressed() {
         Session session = Session.getActiveSession();
@@ -175,6 +281,9 @@ public class MainActivity extends FragmentActivity {
         // the user should be navigated back to splash fragment.
         if (fragments[SETTINGS].isVisible() && (session == null || !session.isOpened())) {
             clearBackStack();
+            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
+            drawerToggle.setDrawerIndicatorEnabled(false);
+            getActionBar().setDisplayHomeAsUpEnabled(false);
             showFragment(SPLASH, false);
         } else {
             super.onBackPressed();
