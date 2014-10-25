@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content" 
+    android:layout_height="wrap_content"
     android:textAppearance="?android:attr/textAppearanceListItemSmall"
     android:gravity="center_vertical"
     android:paddingLeft="@dimen/padding"
     android:paddingRight="@dimen/padding"
-    android:textColor="#FFF"
+    android:textColor="@android:color/tertiary_text_dark"
     android:background="?android:attr/activatedBackgroundIndicator"
-    android:minHeight="?android:attr/listPreferredItemHeightSmall">
-
+    android:minHeight="?android:attr/listPreferredItemHeightSmall"
+    android:clickable="false"
+    android:focusable="false" >
 </TextView>

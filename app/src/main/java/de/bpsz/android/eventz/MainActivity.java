@@ -1,5 +1,6 @@
 package de.bpsz.android.eventz;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -58,7 +59,7 @@ public class MainActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_main);
 
-        ////////////////////////////
+        /////////// Navigation Drawer /////////////////
 
         title = (String) getTitle();
 
@@ -86,8 +87,29 @@ public class MainActivity extends FragmentActivity {
 
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getBaseContext(), R.layout.drawer_list_item, getResources()
-                .getStringArray(R.array.rivers));
+                .getStringArray(R.array.menupoints));
         drawerList.setAdapter(adapter);
+
+        AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                AlertDialog.Builder adb = new AlertDialog.Builder(
+                        MainActivity.this);
+                adb.setTitle("ListView OnClick");
+                adb.setMessage("Selected Item is = "
+                        + drawerList.getItemAtPosition(position));
+                adb.setPositiveButton("Ok", null);
+                adb.show();
+
+
+                // drawerLayout.closeDrawer(drawerList);
+            }
+
+        };
+
+        drawerList.setOnItemClickListener(listener);
 
         drawerToggle.setDrawerIndicatorEnabled(true);
 
@@ -95,17 +117,7 @@ public class MainActivity extends FragmentActivity {
 
         // getActionBar().setDisplayHomeAsUpEnabled(true);
 
-        drawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                // Do Something
-
-                drawerLayout.closeDrawer(drawerList);
-            }
-
-        });
 
         //////////////////////////
 
