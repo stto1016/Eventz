@@ -1,6 +1,5 @@
 package de.bpsz.android.eventz;
 
-import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActionBarDrawerToggle;
@@ -20,6 +19,8 @@ import com.facebook.Session;
 import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 
+import java.util.Hashtable;
+
 
 public class MainActivity extends FragmentActivity {
 
@@ -29,6 +30,7 @@ public class MainActivity extends FragmentActivity {
     private static final int FRAGMENT_COUNT = SETTINGS + 1;
 
     private Fragment[] fragments = new Fragment[FRAGMENT_COUNT];
+    private Hashtable<Integer, String> fragmentTitles = new Hashtable<Integer, String>();
 
     private boolean isResumed = false;
     private UiLifecycleHelper uiHelper;
@@ -37,8 +39,6 @@ public class MainActivity extends FragmentActivity {
     ListView drawerList;
     ActionBarDrawerToggle drawerToggle;
     String title = "";
-
-    private MenuItem logout;
 
     private Session.StatusCallback callback =
             new Session.StatusCallback() {
@@ -59,14 +59,29 @@ public class MainActivity extends FragmentActivity {
 
         setContentView(R.layout.activity_main);
 
-        /////////// Navigation Drawer /////////////////
+        initNavDrawer();
 
-        title = (String) getTitle();
+        FragmentManager fm = getSupportFragmentManager();
+        fragments[SPLASH] = fm.findFragmentById(R.id.splashFragment);
+        fragmentTitles.put(SPLASH, getString(R.string.splash_fragment));
+        fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
+        fragmentTitles.put(SELECTION, getString(R.string.selection_fragment));
+        fragments[SETTINGS] = fm.findFragmentById(R.id.userSettingsFragment);
+        fragmentTitles.put(SETTINGS, getString(R.string.logout_fragment));
 
+        FragmentTransaction transaction = fm.beginTransaction();
+        for (int i = 0; i < fragments.length; i++) {
+            transaction.hide(fragments[i]);
+        }
+        transaction.commit();
+    }
+
+    /**
+     * initializes the navigation Drawer
+     */
+    private void initNavDrawer() {
         drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
-
         drawerList = (ListView) findViewById(R.id.drawer_list);
-
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, R.drawable.ic_drawer,
                 R.string.drawer_open, R.string.drawer_close){
 
@@ -78,77 +93,66 @@ public class MainActivity extends FragmentActivity {
 
             @Override
             public void onDrawerOpened(View drawerView) {
-                getActionBar().setTitle(R.string.menu);
+                getActionBar().setTitle(R.string.app_name);
                 invalidateOptionsMenu();
             }
         };
 
         drawerLayout.setDrawerListener(drawerToggle);
-
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(
                 getBaseContext(), R.layout.drawer_list_item, getResources()
                 .getStringArray(R.array.menupoints));
         drawerList.setAdapter(adapter);
-
         AdapterView.OnItemClickListener listener = new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
-                AlertDialog.Builder adb = new AlertDialog.Builder(
-                        MainActivity.this);
-                adb.setTitle("ListView OnClick");
-                adb.setMessage("Selected Item is = "
-                        + drawerList.getItemAtPosition(position));
-                adb.setPositiveButton("Ok", null);
-                adb.show();
-
-
-                // drawerLayout.closeDrawer(drawerList);
+                selectItem(position);
+                drawerLayout.closeDrawer(drawerList);
             }
 
         };
-
         drawerList.setOnItemClickListener(listener);
-
         drawerToggle.setDrawerIndicatorEnabled(true);
 
         // getActionBar().setHomeButtonEnabled(true);
-
         // getActionBar().setDisplayHomeAsUpEnabled(true);
+    }
 
+    private void selectItem(int position) {
+        switch(position) {
+            case 0:
 
+                break;
+            case 1:
 
-        //////////////////////////
+                break;
+            case 2:
 
-        FragmentManager fm = getSupportFragmentManager();
-        fragments[SPLASH] = fm.findFragmentById(R.id.splashFragment);
-        fragments[SELECTION] = fm.findFragmentById(R.id.selectionFragment);
-        fragments[SETTINGS] = fm.findFragmentById(R.id.userSettingsFragment);
-
-        FragmentTransaction transaction = fm.beginTransaction();
-        for (int i = 0; i < fragments.length; i++) {
-            transaction.hide(fragments[i]);
+                break;
+            case 3:
+                showFragment(SETTINGS, false);
+                break;
         }
-        transaction.commit();
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        uiHelper.onResume();
         isResumed = true;
     }
 
     @Override
     public void onPause() {
         super.onPause();
+        uiHelper.onPause();
         isResumed = false;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Session.getActiveSession().onActivityResult(this, requestCode, resultCode, data);
         uiHelper.onActivityResult(requestCode, resultCode, data);
     }
 
@@ -165,6 +169,13 @@ public class MainActivity extends FragmentActivity {
         return true;
     }
 
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(drawerToggle.onOptionsItemSelected(item)){
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
 
     @Override
@@ -180,11 +191,14 @@ public class MainActivity extends FragmentActivity {
     }
 
     private void showFragment(int fragmentIndex, boolean addToBackStack) {
+
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         for (int i = 0; i < fragments.length; i++) {
             if (i == fragmentIndex) {
                 transaction.show(fragments[i]);
+                title = fragmentTitles.get(i);
+                getActionBar().setTitle(title);
             } else {
                 transaction.hide(fragments[i]);
             }
@@ -208,18 +222,34 @@ public class MainActivity extends FragmentActivity {
             if (state.isOpened()) {
                 // If the session state is open:
                 // Show the authenticated fragment
-                getActionBar().setDisplayHomeAsUpEnabled(true);
-                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-                drawerToggle.setDrawerIndicatorEnabled(true);
+                lockNavDrawer(false);
                 showFragment(SELECTION, false);
 
             } else if (state.isClosed()) {
                 // If the session state is closed:
                 // Show the login fragment
+                lockNavDrawer(true);
+                showFragment(SPLASH, false);
+            }
+        }
+    }
+
+    /**
+     * Locks the Navigation Drawer and makes the drawerToggle invisible
+     * @param lock boolean, whether nav drawer should be locked or not
+     */
+    private void lockNavDrawer(boolean lock) {
+        if (lock) {
+            if (getActionBar() != null) {
                 getActionBar().setDisplayHomeAsUpEnabled(false);
                 drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
                 drawerToggle.setDrawerIndicatorEnabled(false);
-                showFragment(SPLASH, false);
+            }
+        } else {
+            if (getActionBar() != null) {
+                getActionBar().setDisplayHomeAsUpEnabled(true);
+                drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
+                drawerToggle.setDrawerIndicatorEnabled(true);
             }
         }
     }
@@ -228,63 +258,18 @@ public class MainActivity extends FragmentActivity {
     protected void onResumeFragments() {
         super.onResumeFragments();
         Session session = Session.getActiveSession();
-
         if (session != null && session.isOpened()) {
             // if the session is already open,
             // try to show the selection fragment
-            getActionBar().setDisplayHomeAsUpEnabled(true);
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED);
-            drawerToggle.setDrawerIndicatorEnabled(true);
+            lockNavDrawer(false);
             showFragment(SELECTION, false);
         } else {
             // otherwise present the splash screen
             // and ask the person to login.
-            getActionBar().setDisplayHomeAsUpEnabled(false);
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            drawerToggle.setDrawerIndicatorEnabled(false);
+            lockNavDrawer(true);
             showFragment(SPLASH, false);
         }
     }
-
-    /*
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        // only add the menu when the selection fragment is showing
-        if (fragments[SELECTION].isVisible()) {
-            if (menu.size() == 0) {
-                logout = menu.add(R.string.menu_logout);
-            }
-            return true;
-        } else {
-            menu.clear();
-            logout = null;
-        }
-        return false;
-    }
-
-    */
-
-
-    /*
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.equals(logout)) {
-            showFragment(SETTINGS, true);
-            return true;
-        }
-        return false;
-    }
-
-    */
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if(drawerToggle.onOptionsItemSelected(item)){
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 
     @Override
     public void onBackPressed() {
@@ -293,9 +278,7 @@ public class MainActivity extends FragmentActivity {
         // the user should be navigated back to splash fragment.
         if (fragments[SETTINGS].isVisible() && (session == null || !session.isOpened())) {
             clearBackStack();
-            drawerLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED);
-            drawerToggle.setDrawerIndicatorEnabled(false);
-            getActionBar().setDisplayHomeAsUpEnabled(false);
+            lockNavDrawer(true);
             showFragment(SPLASH, false);
         } else {
             super.onBackPressed();
@@ -314,5 +297,4 @@ public class MainActivity extends FragmentActivity {
             manager.popBackStack();
         }
     }
-
 }

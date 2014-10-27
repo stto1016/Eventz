@@ -19,5 +19,8 @@
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
 
+    <string name="selection_fragment">Auswahl</string>
+    <string name="splash_fragment">Login</string>
+    <string name="logout_fragment">Logout</string>
 
 </resources>
