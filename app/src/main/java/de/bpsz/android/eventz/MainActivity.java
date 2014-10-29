@@ -297,4 +297,10 @@ public class MainActivity extends FragmentActivity {
             manager.popBackStack();
         }
     }
+
+    // switch on the MainScreen to test it without logging in
+    public void switchMainScreen (View view) {
+        Intent intent = new Intent(this, MainScreenActivity.class );
+        startActivity(intent);
+    }
 }

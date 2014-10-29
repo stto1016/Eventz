@@ -28,12 +28,12 @@
             android:value="@string/app_id" />
 
         <activity
-            android:name=".MainScreenActivity"
-            android:label="@string/title_activity_mainscreen" >
-        </activity>
-        <activity
             android:name=".EventDetailsActivity"
             android:label="@string/title_activity_event_details" >
+        </activity>
+        <activity
+            android:name=".MainScreenActivity"
+            android:label="@string/title_activity_main_screen" >
         </activity>
     </application>
 
