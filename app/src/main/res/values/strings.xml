@@ -30,5 +30,10 @@
     <string name="title_activity_event_details">EventDetailsActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_main_screen">MainScreenActivity</string>
+    <string name="username">Benutzername</string>
+    <string name="password">Passwort</string>
+    <string name="login">Go!</string>
+    <string name="registry">Registrieren</string>
+    <string name="title_activity_registry">Registry</string>
 
 </resources>

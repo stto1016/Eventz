@@ -298,9 +298,15 @@ public class MainActivity extends FragmentActivity {
         }
     }
 
-    // switch on the MainScreen to test it without logging in
+    // switch on the MainScreenActivity to test it without logging in
     public void switchMainScreen (View view) {
         Intent intent = new Intent(this, MainScreenActivity.class );
+        startActivity(intent);
+    }
+
+    //switches to RegistryActivity
+    public void switchRegistry (View view) {
+        Intent intent = new Intent(this, RegistryActivity.class);
         startActivity(intent);
     }
 }

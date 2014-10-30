@@ -157,7 +157,7 @@ public class MainScreenActivity extends Activity implements EventFragment.OnFrag
 
         @Override
         public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                Bundle savedInstanceState) {
+                                 Bundle savedInstanceState) {
             View rootView = inflater.inflate(R.layout.fragment_main_screen, container, false);
             return rootView;
         }
