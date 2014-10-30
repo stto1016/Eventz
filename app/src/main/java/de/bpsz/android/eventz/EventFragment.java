@@ -59,10 +59,9 @@ public class EventFragment extends ListFragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
 
-        // TODO: Change Adapter to display your content
         List<Event> eventList = new ArrayList<Event>();
-        // TODO remove dummy content
         eventList.add(new Event("TestEvent"));
+        eventList.add(new Event("Zweites Event"));
         setListAdapter(new ArrayAdapter<Event>(getActivity(),
                 android.R.layout.simple_list_item_1, android.R.id.text1, eventList));
     }
@@ -100,6 +99,7 @@ public class EventFragment extends ListFragment {
             // fragment is attached to one) that an item has been selected.
         }
     }
+
 
     /**
     * This interface must be implemented by activities that contain this
