@@ -35,7 +35,8 @@
     <string name="login">Go!</string>
     <string name="registry">Registrieren</string>
     <string name="title_activity_registry">Registry</string>
-    <string name="registry_name">Benutzername:</string>;
-    <string name="registry_heading">Registrierung</string>
+    <string name="registry_name">Benutzername:</string>
+;    <string name="registry_heading">Registrierung</string>
+    <string name="title_activity_login_successful">LoginSuccessfulActivity</string>
 
 </resources>

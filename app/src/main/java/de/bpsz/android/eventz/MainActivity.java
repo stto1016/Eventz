@@ -13,7 +13,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.facebook.Session;
 import com.facebook.SessionState;
@@ -23,6 +26,18 @@ import java.util.Hashtable;
 
 
 public class MainActivity extends FragmentActivity {
+
+    // Email, password edittext
+    EditText txtUsername, txtPassword;
+
+    // login button
+    Button btnLogin;
+
+    // Alert Dialog Manager
+    AlertDialogManager alert = new AlertDialogManager();
+
+    // Session Manager Class
+    SessionManager session;
 
     private static final int SPLASH = 0;
     private static final int SELECTION = 1;
@@ -58,6 +73,54 @@ public class MainActivity extends FragmentActivity {
         uiHelper.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+
+        session = new SessionManager(getApplicationContext());
+
+        txtUsername = (EditText) findViewById(R.id.login_username);
+        txtPassword = (EditText) findViewById(R.id.login_password);
+
+        Toast.makeText(getApplicationContext(), "User Login Status: " + session.isLoggedIn(), Toast.LENGTH_LONG).show();
+
+        // Login button
+        btnLogin = (Button) findViewById(R.id.login_button_without_facebook);
+
+        // Login button click event
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View arg0) {
+                // Get username, password from EditText
+                String username = txtUsername.getText().toString();
+                String password = txtPassword.getText().toString();
+
+                // Check if username, password is filled
+                if (username.trim().length() > 0 && password.trim().length() > 0) {
+                    // For testing puspose username, password is checked with sample data
+                    // username = test
+                    // password = test
+                    if (username.equals("test") && password.equals("test")) {
+
+                        // Creating user login session
+                        // For testing i am strong name, email as follow
+                        // Use user real data
+                        session.createLoginSession("Calvin Paciner", "cpaciner@gmail.com");
+
+                        // Staring MainActivity
+                        Intent i = new Intent(getApplicationContext(), LoginSuccessfulActivity.class);
+                        startActivity(i);
+                        finish();
+
+                    } else {
+                        // username / password doesn't match
+                        alert.showAlertDialog(MainActivity.this, "Login failed..", "Username/Password is incorrect", false);
+                    }
+                } else {
+                    // user didn't entered username or password
+                    // Show alert asking him to enter the details
+                    alert.showAlertDialog(MainActivity.this, "Login failed..", "Please enter username and password", false);
+                }
+            }
+        });
 
         initNavDrawer();
 

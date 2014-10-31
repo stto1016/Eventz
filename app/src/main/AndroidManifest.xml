@@ -39,6 +39,10 @@
             android:name=".RegistryActivity"
             android:label="@string/title_activity_registry" >
         </activity>
+        <activity
+            android:name=".LoginSuccessfulActivity"
+            android:label="@string/title_activity_login_successful" >
+        </activity>
     </application>
 
 </manifest>
